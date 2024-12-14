@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #f5f8fb, #dff0e8);
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: #2f4f4f;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+        }
+        .content {
+            padding: 20px;
+        }
+        .question {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .option-label span{
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background: #f8f8f8;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            width: 90%;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s, border-color 0.3s, color 0.3s;
+        }
+
+        .option-label input[type="radio"] {
+            display: none;
+        }
+
+        .option-label span:hover {
+            background: #e6f7ff;
+            border-color: #2f4f4f;
+        }
+
+        .option-label input[type="radio"]:checked + span {
+            background: #2f4f4f;
+            color: white;
+            border-color: #2f4f4f;
+        }
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+        }
+        .footer button {
+            background: #ffffff;
+            color: #2f4f4f;
+            border: 2px solid;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .footer button:hover {
+            background: #2f4f4f;
+            color: #ffffff;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+        .pagination button {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: #ffffff;
+            border: 2px solid;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            padding: inherit;
+            transition: background 0.3s;
+        }
+        .pagination button.active {
+            background: #2f4f4f;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+
+            .header {
+                font-size: 20px;
+            }
+
+            .question {
+                font-size: 16px;
+            }
+
+            .options {
+                gap: 8px;
+            }
+
+            .option-label span {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+
+            .footer button {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+
+            .pagination button {
+                width: 25px;
+                height: 25px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 5px;
+            }
+
+            .header {
+                font-size: 18px;
+            }
+
+            .question {
+                font-size: 14px;
+            }
+
+            .options {
+                gap: 6px;
+            }
+
+            .option-label span {
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+
+            .footer button {
+                font-size: 10px;
+                padding: 6px 10px;
+            }
+
+            .pagination button {
+                width: 20px;
+                height: 20px;
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            Quiz
+        </div>
+        <div class="content">
+            <div class="question">
+                Question {{ current_index|add:1 }} of {{ total_questions }}
+            </div>
+            <p>{{ question.text }}</p>
+            <form method="POST" action="{% url 'quiz:save_answer' %}">
+                {% csrf_token %}
+                <div class="options">
+                    {% for key, option in question.options.items %}
+                        <label class="option-label">
+                            <input 
+                                type="radio" 
+                                name="selected_option" 
+                                value="{{ key }}" 
+                                {% if selected_option == key %}checked{% endif %}
+                            >
+                            <span>{{ key }}: {{ option }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+                <div class="footer">
+                    <button type="submit" name="action" value="previous">Previous</button>
+                    <div class="pagination">
+                        {% for i in question_range  %}
+                            <button class="{% if i == current_index %}active{% endif %}" 
+                              type="submit" name="action" value="{{i}}"
+                            >{{ i|add:1 }}</button>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" name="action" value="next">Next</button>
+                    <button type="submit" name="action" value="submit">Finish</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
